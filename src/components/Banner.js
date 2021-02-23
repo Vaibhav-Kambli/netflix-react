@@ -1,21 +1,51 @@
-import React from 'react'
+import axios from '../axios'
+import React, { useEffect, useState } from 'react'
 import '../css/Banner.css'
+import requests from '../Requests'
 
 const Banner = () => {
+    const [movie, setMovie] = useState([])
+    
+    useEffect(() => {
+
+        const fetchData = async () => {
+            try{
+                const {data} = await axios.get(requests.fetchNetflixOriginals)
+                setMovie(data.results[Math.floor(Math.random() * data.results.length - 1)])
+                return data
+            }
+            catch(err){
+                console.log(err)
+            }
+            
+        }
+        fetchData()
+    }, [])
+
+    const truncate = (string, n) => {
+        return string?.length > n ? string.substr(0, n - 1) + '...' : string;
+    }
+
     return (
+       
         <header className="banner" style={{
             backgroundSize: "cover",
-            backgroundImage: `url("https://assets.nflxext.com/ffe/siteui/vlv3/8ef88e03-6f89-4c75-ae51-f8da7d252358/ed4281d6-ecf0-4c7b-8a73-eef80a8289ac/CA-en-20210208-popsignuptwoweeks-perspective_alpha_website_small.jpg")`,
+            backgroundImage: `url("https://images.tmdb.org/t/p/original/${movie?.backdrop_path}")`,
             backgroundPosition: "center center",
         }}>
-        <div className="banner__contents">
-            <h1 className="banner__title">Movie Name</h1>
+        {movie && (
+            <div className="banner__contents">
+            <h1 className="banner__title">{movie && movie.name}</h1>
             <div className="banner__buttons">
                 <button className="banner__button" >Play</button>
                 <button className="banner__button">My List</button>
             </div>
-            <h1 className="banner__description"> This is movie / banner description</h1>
+            <h1 className="banner__description">
+            {truncate(movie.overview, 150)}
+            </h1>
         </div>
+        )}
+       
         <div className="banner--fadeBottom"/>
         </header>
     )
